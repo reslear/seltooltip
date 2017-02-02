@@ -1,16 +1,18 @@
 <!DOCTYPE HTML>
+<meta charset="utf-8">
 
-<style>body{width:70%;margin: 100px auto;}</style>
+<style>body{width:70%;margin: 100px auto;}*:focus{box-shadow: 1px 1px 5px rgba(0,0,100,.3);border-radius: 3px;outline: 0;}</style>
 <h1>Contenteditable block</h1>
 <div id="d" seltooltip="default" style="padding:20px;" contenteditable="true">
 Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
+<div style="font-size:8px">Lorem<b>ddd</b> Ipsum</div> has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
 It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. 
 It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 </div>
 
 <h1>Plain text block</h1>
-<div seltooltip="two" style="padding:20px;color: green">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</div>
+<div seltooltip="two" style="padding:20px;color: green">It is 
+	<div style="font-size:8px">Lorem<b>ddd</b> Ipsum</div>  a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</div>
 
 
 <style>
@@ -64,6 +66,6 @@ It was popularised in the 1960s with the release of Letraset sheets containing L
 	
 	document.head.appendChild(script);
 	
-})('seltooltip-v0.1.js', { default: 'Tooltip text', two: 'CC Attribution'});
+})('seltooltip-v0.1.js?6', { default: 'Tooltip text', two: 'CC Attribution'});
 	
 </script>

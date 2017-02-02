@@ -25,12 +25,45 @@ var seltooltip = (function() {
 	var SOURCE = {};
 	
 	var tooltip = {
+
 				
+		hasParent: function( node ) {
+			
+
+			var attribute = node.getAttribute('seltooltip');
+			
+			if( attribute ) {
+				return attribute;	
+			} else {
+				if( node.parentElement && node.tagName !== 'BODY' ) {
+					return tooltip.hasParent( node.parentElement );
+				}
+			}
+			
+			return false;
+		},
+		/*
+		hasParent: function( node ) {
+			
+
+			var attribute = node.getAttribute('seltooltip');
+			
+			if( attribute ) {
+				return attribute;	
+			} else {
+				if( node.parentElement && node.tagName !== 'BODY' ) {
+					return tooltip.hasParent( node.parentElement );
+				}
+			}
+			
+			return false;
+		},
+			*/	
 		create: function() {
 				
 			tooltip.node = document.createElement('div');
 			tooltip.node.className = 'seltooltip hide';
-
+			
 			document.body.appendChild( tooltip.node );
 		}
 	};
@@ -59,15 +92,26 @@ var seltooltip = (function() {
 		
 		mousedown : function( event ){
 			
-			//event.preventDefault();
-			tooltip.node.classList.add('hide');
+			if( event.target == tooltip.node ) { 
+				event.preventDefault();
+			} else {
+				tooltip.node.classList.add('hide');
+			}
 		},
 		
 		mouseup : function( event ) {
 			
+
+			var parent = select.range().commonAncestorContainer;
+			var attribute = tooltip.hasParent( parent.nodeType === 3 ? parent.parentNode : parent );
 			
-			var parent = select.range().commonAncestorContainer.parentElement;
-			var attribute = parent.getAttribute('seltooltip');
+			//console.log( !attribute || !SOURCE.hasOwnProperty(attribute) || !select.text().length || event.target == tooltip.node )
+			/*
+			console.log(event.target,tooltip.node);
+console.log(event.target == tooltip.node);
+			*/
+			//console.log(event.target,parent);
+			
 			
 			if( !attribute || !SOURCE.hasOwnProperty(attribute) || !select.text().length || event.target == tooltip.node ){
 				return false;
