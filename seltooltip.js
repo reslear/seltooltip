@@ -24,24 +24,6 @@ var seltooltip = (function() {
 
     "use strict";
 
-    var utils = {
-
-        extend: function( object1, object2 ) {
-
-            for( var key in object2 ) {
-
-                if( !object1.hasOwnProperty( key ) ){
-                    continue;
-                }
-
-                var hasArray = Array.isArray(object1[key]) && Array.isArray(object2[key]);
-                object1[key] = hasArray ? object1[key].concat(object2[key]) : object2[key];
-            }
-
-            return object1;
-
-        }
-    };
 
     var source = {
 
@@ -52,19 +34,25 @@ var seltooltip = (function() {
             '<div class="seltooltip-col">',
 
                 // bold text
-                '<a data-st-command="bold">Ж</a>',
+                '<a data-st-type="exec" data-st-command="bold">Ж</a>',
 
                 // italic text
-                '<a data-st-command="italic">I</a>',
+                '<a data-st-type="exec" data-st-command="italic">I</a>',
 
                 // s text
-                '<a data-st-command="strikeThrough">S</a>',
+                '<a data-st-type="exec" data-st-command="strikeThrough">S</a>',
 
                 // split
                 '&nbsp;',
 
                 // link
-                '<a data-st-command="italic">URL...</a>',
+                '<a data-st-type="exec" data-st-command="italic">URL...</a>',
+
+                // mark
+                '<a data-st-type="addParent" data-st-command=\'mark,{\"class\":\"myclass\"}\' >MARK</a>',
+
+                // code
+                '<a data-st-type="addParent" data-st-command=\'code,{\"class\":\"myclass\", \"style\":\"font-family:monospace;background:#f7f7f7;padding:5px;border-radius:3px;margin:5px;box-sizing:border-box;\"}\' >&lt;code></a>',
 
             '</div>'
 
@@ -112,7 +100,7 @@ var seltooltip = (function() {
                 tooltip.node.appendChild( elemSource.cloneNode(true) );
             }
 
-            // calculate sizes
+            // calculate sizes,  TODO: calculate если postion за пределы window
             var rect = select.rect();
             var node = tooltip.node.getBoundingClientRect();
 
@@ -131,8 +119,15 @@ var seltooltip = (function() {
             return window.getSelection();
         },
 
-        range: function() {
-            return select.get().getRangeAt(0);
+        range: function( returnSel ) {
+
+            var sel = select.get(), range;
+
+            if( sel.rangeCount ) {
+                range = sel.getRangeAt(0);
+            }
+
+            return returnSel ? [range, sel] : range;
         },
 
         text: function() {
@@ -140,23 +135,28 @@ var seltooltip = (function() {
         },
 
         rect: function() {
-            return select.range().getBoundingClientRect();
+            var range = select.range();
+            return range ? range.getBoundingClientRect() : false;
         }
 
     };
-    var exec = {
-        clickEvent: function( el ){
-            var command = el.dataset.stCommand;
 
-            if( !command ) {
-                return false;
+
+    var tools = {
+
+        parseJson: function( json ){
+
+            if( !json ) {
+                return;
             }
 
-            document.execCommand(command, false, false);
+            try {
+                return JSON.parse( json );
+            } catch (e) {
+                return false;
+            }
         },
-    };
 
-    var check = {
         isTooltip: function( event, fx ) {
 
             var el = event.target;
@@ -171,11 +171,61 @@ var seltooltip = (function() {
             // TODO: while( parentElement)
             if( el.dataset.hasOwnProperty('stCommand') ){
                 if( fx ) {
-                    fx.call(this, el);
+                    tools.applyExectute.call(this, el);
                 }
             }
 
             return true;
+        },
+
+        applyExectute: function( el ) {
+
+            var type = el.dataset.stType;
+            var command = el.dataset.stCommand;
+
+            if( !type && !command ) {
+                return false;
+            }
+
+            var regexp = new RegExp('(.+?),(.*?)$','i');
+            tools.execute[type].apply(null, regexp.test(command) ? command.match(regexp).slice(1, 3) : [command, false] );
+        },
+
+        execute: {
+            exec: function( command, value ){
+                document.execCommand(command, false, value);
+            },
+
+            addParent: function( tag, attr ) {
+
+                var _range = select.range( true ), prop;
+
+                // выходим, если range == false
+                if( !_range[0] ) {return;}
+
+                var range = _range[0].cloneRange();
+                var selected = range.extractContents();
+
+                // Создаём родителя и задаём ему аттрибуты
+                var element = document.createElement(tag);
+
+                // задаём атррибуты если указаны
+                var attributes = tools.parseJson(attr);
+                if( attributes ) {
+                    for( prop in attributes ){
+                        element.setAttribute(prop, attributes[prop]);
+                    }
+                }
+
+                // Вставляем контент
+                element.appendChild( selected );
+                range.insertNode( element );
+
+                // добавляем выделение
+                _range[1].removeAllRanges();
+                _range[1].addRange(range);
+
+            }
         }
     };
 
@@ -184,7 +234,7 @@ var seltooltip = (function() {
 
         mousedown : function( event ) {
 
-            if( check.isTooltip(event) ){
+            if( tools.isTooltip(event) ){
                 return false;
             }
 
@@ -197,7 +247,7 @@ var seltooltip = (function() {
             var attribute = active.dataset.seltooltip;
 
             // Если нажатие на tooltip или кнопку tooltip - остановить и выйти
-            if( check.isTooltip(event, exec.clickEvent) ){
+            if( tools.isTooltip(event, true) ){
                 return false;
             }
 
@@ -209,14 +259,13 @@ var seltooltip = (function() {
 
             // setTimeout - в данном случае полезный
             // использован как fix для проверки выделения, при отпускании клавиши
-            setTimeout( tooltip.show, 100, attribute );
+            setTimeout( tooltip.show, 0, attribute );
 
         }
 
     };
 
     var publicMethods = {
-
 
     };
 
