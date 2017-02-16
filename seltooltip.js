@@ -13,10 +13,12 @@
     - поддержка textarea
     - позиция если за размерами окнаа
     - ...
-    - функции вставки текста
+    ✓ функции вставки блоков
     - bug (повтор скрытия и показа) при двойном клике на выделенный текст
 
     ✓ fix 1, проблема при выделении выделенного текста
+    - отдельный tooltip для каждого поля
+    - ...
 */
 
 
@@ -52,7 +54,7 @@ var seltooltip = (function() {
                 '<a data-st-type="addParent" data-st-command=\'mark,{\"class\":\"myclass\"}\' >MARK</a>',
 
                 // code
-                '<a data-st-type="addParent" data-st-command=\'code,{\"class\":\"myclass\", \"style\":\"font-family:monospace;background:#f7f7f7;padding:5px;border-radius:3px;margin:5px;box-sizing:border-box;\"}\' >&lt;code></a>',
+                '<a data-st-type="addParent" data-st-command=\'code,{\"class\":\"myclass\", \"style\":\"font-family:monospace;background:#f7f7f7;padding:3px5px;border-radius:3px;margin:5px;box-sizing:border-box;\"}\' >&lt;code></a>',
 
             '</div>'
 
